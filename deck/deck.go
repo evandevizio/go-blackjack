@@ -10,9 +10,9 @@ import (
 var deck []Card
 
 type Card struct {
-	number int // The number of the card in sequence (A=1, J=11, Q=12, etc.)
-	suit   string
-	symbol string // A, 2, 3, ... , J, Q, K
+	Number int // The Number of the card in sequence (A=1, J=11, Q=12, etc.)
+	Suit   string
+	Symbol string // A, 2, 3, ... , J, Q, K
 }
 
 func NewDeck() []Card {
@@ -22,63 +22,66 @@ func NewDeck() []Card {
 	fmt.Println("Creating a new 52 card deck..." + "\n")
 
 	for s := 0; s <= 12; s++ {
-		newDeck[s].number = s + 1
-		newDeck[s].suit = "Spades"
+		newDeck[s].Number = s + 1
+		newDeck[s].Suit = "Spades"
 	}
 	for d := 13; d <= 26; d++ {
-		newDeck[d].number = (d + 1) - 13
-		newDeck[d].suit = "Diamonds"
+		newDeck[d].Number = (d + 1) - 13
+		newDeck[d].Suit = "Diamonds"
 	}
 	for c := 26; c <= 39; c++ {
-		newDeck[c].number = (c + 1) - 26
-		newDeck[c].suit = "Clubs"
+		newDeck[c].Number = (c + 1) - 26
+		newDeck[c].Suit = "Clubs"
 	}
 	for h := 39; h <= 51; h++ {
-		newDeck[h].number = (h + 1) - 39
-		newDeck[h].suit = "Hearts"
+		newDeck[h].Number = (h + 1) - 39
+		newDeck[h].Suit = "Hearts"
 	}
 	time.Sleep(2 * time.Second)
 	FormatDeck(&newDeck)
 	return newDeck
 }
 
-func FormatDeck(deck *[]Card) { // Delegate symbols
+func FormatDeck(deck *[]Card) { // Delegate Symbols
 	for i := 0; i < len(*deck); i++ {
-		if ((*deck)[i].number != 1) && ((*deck)[i].number != 11) &&
-			((*deck)[i].number != 12) && ((*deck)[i].number != 13) {
-			(*deck)[i].symbol = strconv.Itoa((*deck)[i].number)
+		if ((*deck)[i].Number != 1) && ((*deck)[i].Number != 11) &&
+			((*deck)[i].Number != 12) && ((*deck)[i].Number != 13) {
+			(*deck)[i].Symbol = strconv.Itoa((*deck)[i].Number)
 		} else { // This deals with face cards
-			switch (*deck)[i].number {
+			switch (*deck)[i].Number {
 			case 1:
-				(*deck)[i].symbol = "A"
+				(*deck)[i].Symbol = "A"
 			case 11:
-				(*deck)[i].symbol = "J"
+				(*deck)[i].Symbol = "J"
 			case 12:
-				(*deck)[i].symbol = "Q"
+				(*deck)[i].Symbol = "Q"
 			case 13:
-				(*deck)[i].symbol = "K"
+				(*deck)[i].Symbol = "K"
 			default:
-				(*deck)[i].symbol = strconv.Itoa((*deck)[i].number)
+				(*deck)[i].Symbol = strconv.Itoa((*deck)[i].Number)
 			}
 		}
 	}
 }
 
-func PrintDeck(deck []Card) {
-	cardMap := make(map[int]string)
-	cardMap[1] = "A"
-	cardMap[11] = "J"
-	cardMap[12] = "Q"
-	cardMap[13] = "K"
-	suitMap := make(map[string]rune) // Unicode suit characters
-	suitMap["Spades"] = '\u2660'
-	suitMap["Diamonds"] = '\u2666'
-	suitMap["Clubs"] = '\u2663'
-	suitMap["Hearts"] = '\u2665'
-
+func PrintDeck(deck []Card, dealerFlag bool) {
+	CardMap := make(map[int]string)
+	CardMap[1] = "A"
+	CardMap[11] = "J"
+	CardMap[12] = "Q"
+	CardMap[13] = "K"
+	SuitMap := make(map[string]rune) // Unicode Suit characters
+	SuitMap["Spades"] = '\u2660'
+	SuitMap["Diamonds"] = '\u2666'
+	SuitMap["Clubs"] = '\u2663'
+	SuitMap["Hearts"] = '\u2665'
 	for i := 0; i < len(deck); i++ { // Display the cards
-		fmt.Printf("%v"+" "+"%q"+"\n",
-			deck[i].symbol, suitMap[deck[i].suit])
+		if i == 0 && dealerFlag == true {
+			fmt.Println("? '?'") // Hide dealer's first card
+		} else {
+			fmt.Printf("%v"+" "+"%q"+"\n",
+				deck[i].Symbol, SuitMap[deck[i].Suit])
+		}
 	}
 	fmt.Print("\n")
 }
@@ -93,4 +96,15 @@ func ShuffleDeck(deck []Card) []Card {
 	}
 	time.Sleep(2 * time.Second)
 	return shuffled
+}
+
+func RemoveCard(slice []Card, s int) []Card {
+	return append(slice[:s], slice[s+1:]...)
+}
+
+func DrawCard(deck *[]Card, size int) Card {
+	i := 0 // Top card
+	thisCard := (*deck)[i]
+	*deck = RemoveCard(*deck, i)
+	return thisCard
 }
